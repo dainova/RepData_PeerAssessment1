@@ -48,8 +48,6 @@ Let's display  structure of produced summary file with `str(actSumm)` for futher
 ```
 <br><br>  
 
-bb <- c(1,3)
-bb
 
 &nbsp;&nbsp;&nbsp;&nbsp;
 Let's produce histogram of the total number of steps taken each day:
@@ -58,7 +56,6 @@ Let's produce histogram of the total number of steps taken each day:
 ```r
 hist (actSumm$stepSum, 12, main = "Histogram of Total Steps per Day", xlab = "Number of steps by ranges ",ylim=c(0,20))
 ```
-
 ![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png) 
 
 &nbsp;&nbsp;&nbsp;&nbsp;
@@ -91,8 +88,8 @@ names(actAvg)[2] <- "stepMean"
 
 ggplot(actAvg, aes(interval, stepMean)) + geom_point(color = "Red" ) + labs(title = "5 min Interval plot", x = "5-min intervals", y = " Mean of Steps")
 ```
-
 ![plot of chunk ch5](figure/ch5-1.png) 
+
 <br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;
 
@@ -226,8 +223,8 @@ abline(v = median(actSumm$stepSum), col = 4, lwd = 4)
 hist (actSummNew$stepSum, 12, main = "Histogram of Total Steps per Day (no NA)", xlab = "Number of steps by ranges ")
 abline(v = median(actSummNew$stepSum), col = 4, lwd = 4)
 ```
-
 ![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png) 
+
 <br><br>&nbsp;&nbsp;&nbsp;&nbsp;
 
 Lets calculate new mean and median:
@@ -292,7 +289,7 @@ plot(y = actNewWnd.Mean, x = names(actNewWnd.Mean), type = "l", xlab = "5-Minute
 ![plot of chunk unnamed-chunk-15](figure/unnamed-chunk-15-1.png) 
 
 <br><br>&nbsp;&nbsp;&nbsp;&nbsp;
-From those plsot we can see that distbution is different for weekend and weekdays.
+From those plot we can see that distribution is different for weekend and weekdays.
 
 
 
