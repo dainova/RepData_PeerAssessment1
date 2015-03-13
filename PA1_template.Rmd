@@ -5,7 +5,9 @@ date: "Thursday, March 12, 2015"
 output: html_document
 ---
 
-setwd("C:/RR/C5")
+##setwd("C:/RR/C5")
+##getwd()
+
 
 [My github page](https://github.com/dainova/RepData_PeerAssessment1)
 
@@ -44,7 +46,7 @@ Let's produce histogram of the total number of steps taken each day:
 ```{r,echo=TRUE}
 hist (actSumm$stepSum, 12, main = "Histogram of Total Steps per Day", xlab = "Number of steps by ranges ",ylim=c(0,20))
 ```
-
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3.png) 
 &nbsp;&nbsp;&nbsp;&nbsp;
 Mean of total number of steps taken per day `mean(actSumm$stepSum)`:
 ```{r,echo=FALSE}
@@ -189,5 +191,11 @@ plot(y = actNewWnd.Mean, x = names(actNewWnd.Mean), type = "l", xlab = "5-Minute
 <br><br>&nbsp;&nbsp;&nbsp;&nbsp;
 From those plsot we can see that distbution is different for weekend and weekdays.
 
+##library(knitr)
+##library(markdown)
+##install.packages("knitr")
+##install.packages("markdown")
+
+##knit('PA1_template.Rmd')
 
 
