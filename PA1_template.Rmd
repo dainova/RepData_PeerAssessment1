@@ -1,25 +1,187 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
+title: "Peer Assessment 1"
+author: "Viktor Mo"
+date: "Thursday, March 12, 2015"
+output: html_document
 ---
 
+setwd("C:/RR/C5")
 
-## Loading and preprocessing the data
+[My github page](https://github.com/dainova/RepData_PeerAssessment1)
 
-
-
-## What is mean total number of steps taken per day?
-
+<br><br>  
 
 
-## What is the average daily activity pattern?
+&nbsp;&nbsp;&nbsp;&nbsp;
+First let's load Libs and Prepare data. Produced dataset **_actSumm_** will display total number of steps taken per day. NA values ommited.
+
+```{r,echo=TRUE}
+library (plyr)
+library(ggplot2)
+
+act <- read.csv ('activity.csv')             ## Factors blocked for now
+actNA  <- na.omit(act)
+actSumm <- ddply (actNA,.(date), summarize, stepSum=sum (steps))
+head(actSumm)
+
+```
+<br><br>  
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+Let's display  structure of produced summary file with `str(actSumm)` for futher reference and cross checking:
+
+```{r, echo=FALSE}
+str(actSumm)
+```
+<br><br>  
+
+bb <- c(1,3)
+bb
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+Let's produce histogram of the total number of steps taken each day:
+
+```{r,echo=TRUE}
+hist (actSumm$stepSum, 12, main = "Histogram of Total Steps per Day", xlab = "Number of steps by ranges ",ylim=c(0,20))
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+Mean of total number of steps taken per day `mean(actSumm$stepSum)`:
+```{r,echo=FALSE}
+mean(actSumm$stepSum, rm.na=TRUE)
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+And median `median(actSumm$stepSum)`:
+```{r,echo=FALSE}
+median(actSumm$stepSum)
+```
 
 
 
-## Imputing missing values
+*What is the average daily activity pattern?
+<br><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+Display  average daily activity pattern using time series plot of 5-min interval and average number of steps :
+
+
+```{r  ch5}
+actAvg <- aggregate(actNA$steps, list(interval = as.numeric(as.character(actNA$interval))), FUN = "mean")
+names(actAvg)[2] <- "stepMean"
+
+ggplot(actAvg, aes(interval, stepMean)) + geom_point(color = "Red" ) + labs(title = "5 min Interval plot", x = "5-min intervals", y = " Mean of Steps")
+
+
+```
+<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;
 
 
 
-## Are there differences in activity patterns between weekdays and weekends?
+Find interval with max  number of steps:
+
+```{r echo=TRUE}
+actAvg[actAvg$stepMean == max(actAvg$stepMean), ]
+```
+<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+
+Find how many NA valus we have in dataset:
+```{r echo=TRUE}
+colMeans(is.na(act))   ## Percentage NA for each of column
+sum(is.na(act$steps))  ## Number of NA values 
+```
+NA only present in steps column
+
+<br><br>&nbsp;&nbsp;&nbsp;&nbsp;
+We replace NA values in original dataset with mean value for given interval for more realistic picture:
+```{r echo=TRUE}
+actNew <- act 
+for (i in 1:nrow(actNew)) {
+    if (is.na(actNew$steps[i])) {
+        actNew$steps[i] <- actAvg[which(actNew$interval[i] == actAvg$interval), ]$stepMean
+    }
+}
+```
+<br><br>&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+Now we can observe that NA were replaced with mean values and make sure we don't have NA values in new dataset:
+```{r echo=TRUE}
+head(act,3)      ##before
+head(actNew,3)   ##after
+colMeans(is.na(actNew))   ## Percentage NA for each of column
+```
+<br><br>&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+
+New histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. 
+```{r echo=TRUE}
+actSummNew <- ddply (actNew,.(date), summarize, stepSum=sum (steps))
+head(actSummNew)
+```
+###colMeans(is.na(actSummNew))
+
+```{r echo=TRUE}
+par(mfrow=c(1,2))
+hist (actSumm$stepSum, 12, main = "Histogram of Total Steps per Day", xlab = "Number of steps by ranges ",ylim=c(0,20))
+abline(v = median(actSumm$stepSum), col = 4, lwd = 4)
+
+hist (actSummNew$stepSum, 12, main = "Histogram of Total Steps per Day (no NA)", xlab = "Number of steps by ranges ")
+abline(v = median(actSummNew$stepSum), col = 4, lwd = 4)
+```
+<br><br>&nbsp;&nbsp;&nbsp;&nbsp;
+
+Lets calculate new mean and median:
+```{r,echo=TRUE}
+mean(actSummNew$stepSum)
+```
+
+```{r,echo=TRUE}
+median(actSummNew$stepSum)
+```
+<br><br>&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+Comparing values we can determine that difference is minimal so our approach replacing missing values worked OK.
+
+
+####################################################################################
+ date <- factor(c("10/1/2002","10/10/2002","10/11/2002","10/12/2002","10/13/2002"))
+ stepSumNew <- c(10766.19, 9900.00,10304.00, 17382.00, 12426.00)
+ actSummNew <- data.frame(date,stepSum) 
+ 
+actSummNew <- ddply (actNew,.(date), summarize, stepSum=sum (steps))
+
+colMeans(is.na(actSummNew))
+str(actSummNew)
+actSummNew
+actSummNew$date <-as.Date(actSummNew$date, format="%m,/%d,/%Y")
+head(actSummNew)
+
+
+actSummNew$wday <- weekdays(as.Date(actSummNew$date))
+head(actSummNew)
+head(actSumm)
+
+
+actSummNew
+actSumm
+
+actSummNew$wdayF <- as.factor(c("weekend", "weekday"))
+act_new[actSummNew$wday == "Sunday" | actSummNew$wday == "Saturday" ,5]<- factor("weekend")
+act_new[!(actSummNew$wday == "Sunday" | actSummNew$wday == "Saturday"),5 ]<- factor("weekday")
+
+
+
+
+
+
+
+
+
+
