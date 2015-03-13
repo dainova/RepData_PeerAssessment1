@@ -123,10 +123,12 @@ New histogram of the total number of steps taken each day and Calculate and repo
 ```{r echo=TRUE}
 actSummNew <- ddply (actNew,.(date), summarize, stepSum=sum (steps))
 head(actSummNew)
+head(actNew)
 ```
-###colMeans(is.na(actSummNew))
+
 
 ```{r echo=TRUE}
+opar=par(ps=12) 
 par(mfrow=c(1,2))
 hist (actSumm$stepSum, 12, main = "Histogram of Total Steps per Day", xlab = "Number of steps by ranges ",ylim=c(0,20))
 abline(v = median(actSumm$stepSum), col = 4, lwd = 4)
@@ -151,37 +153,41 @@ Comparing values we can determine that difference is minimal so our approach rep
 
 
 ####################################################################################
- date <- factor(c("10/1/2002","10/10/2002","10/11/2002","10/12/2002","10/13/2002"))
- stepSumNew <- c(10766.19, 9900.00,10304.00, 17382.00, 12426.00)
- actSummNew <- data.frame(date,stepSum) 
- 
-actSummNew <- ddply (actNew,.(date), summarize, stepSum=sum (steps))
+<br><br>&nbsp;&nbsp;&nbsp;&nbsp;
 
-colMeans(is.na(actSummNew))
-str(actSummNew)
-actSummNew
-actSummNew$date <-as.Date(actSummNew$date, format="%m,/%d,/%Y")
-head(actSummNew)
+To research differences in activity patterns between weekdays and weekends we introduce new factor column _wday_:
 
+```{r,echo=TRUE}
+#str(actNew)
+#head(actNew)
+#colMeans(is.na(actNew)) 
 
-actSummNew$wday <- weekdays(as.Date(actSummNew$date))
-head(actSummNew)
-head(actSumm)
+actNew$date <-as.Date(actNew$date,format="%m/%d/%Y")
+actNew$wday <- weekdays(as.Date(actNew$date,format="%m/%d/%Y"))
+actNew$wday <- ifelse((actNew$wday == "Sunday" | actNew$wday == "Saturday") ,"weekend", "weekday")
+actNew$wday <- as.factor(actNew$wday)
+```
 
+Then we create 2 new dataset for weekend and weekdays and build plots:
+```{r,echo=TRUE}
 
-actSummNew
-actSumm
+actNewDay <- subset(actNew, wday == "weekday") 
+actNewWnd <- subset(actNew, wday == "weekend") 
 
-actSummNew$wdayF <- as.factor(c("weekend", "weekday"))
-act_new[actSummNew$wday == "Sunday" | actSummNew$wday == "Saturday" ,5]<- factor("weekend")
-act_new[!(actSummNew$wday == "Sunday" | actSummNew$wday == "Saturday"),5 ]<- factor("weekday")
+#head(actNewWnd,30)
 
 
+actNewWnd.Mean<-tapply(actNewWnd$steps, actNewWnd$interval, mean)
+actNewDay.Mean<-tapply(actNewDay$steps, actNewDay$interval, mean)
+par(mfrow=c(2,1))
+plot(y = actNewDay.Mean, x = names(actNewDay.Mean), type = "l", xlab = "5-Minute Interval", 
+     main = "Daily Activity Pattern on Weekdays", ylab = "Average number of steps")
+plot(y = actNewWnd.Mean, x = names(actNewWnd.Mean), type = "l", xlab = "5-Minute Interval", 
+     main = "Daily Activity Pattern on Weekends", ylab = "Average number of steps", )
+```
 
-
-
-
-
+<br><br>&nbsp;&nbsp;&nbsp;&nbsp;
+From those plsot we can see that distbution is different for weekend and weekdays.
 
 
 
